@@ -1,0 +1,16 @@
+{
+  "name": "treenipaivakirja",
+  "version": "1.0.0",
+  "description": "Treenipäiväkirja – Node.js + SQLite + JWT",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npx nodemon server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "sql.js": "^1.10.3",
+    "express": "^4.18.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

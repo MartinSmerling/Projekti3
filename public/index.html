@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treenipäiväkirja</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- AUTH-NÄKYMÄ -->
+  <div id="auth-view">
+    <div class="auth-card">
+      <div class="auth-logo">TREENI<span>LOG</span></div>
+      <p class="auth-sub">Kirjaa. Seuraa. Kehity.</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="showTab('login')">Kirjaudu</button>
+        <button class="auth-tab" id="tab-register" onclick="showTab('register')">Rekisteröidy</button>
+      </div>
+
+      <div id="auth-error" class="auth-error" style="display:none;"></div>
+
+      <div id="form-login">
+        <div class="field">
+          <label>Käyttäjänimi</label>
+          <input type="text" id="login-username" placeholder="käyttäjänimi" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label>Salasana</label>
+          <input type="password" id="login-password" placeholder="••••••" autocomplete="current-password" />
+        </div>
+        <button class="btn-primary" onclick="login()">Kirjaudu sisään</button>
+      </div>
+
+      <div id="form-register" style="display:none;">
+        <div class="field">
+          <label>Käyttäjänimi <span class="hint">(väh. 3 merkkiä)</span></label>
+          <input type="text" id="reg-username" placeholder="käyttäjänimi" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label>Salasana <span class="hint">(väh. 6 merkkiä)</span></label>
+          <input type="password" id="reg-password" placeholder="••••••" autocomplete="new-password" />
+        </div>
+        <button class="btn-primary" onclick="register()">Luo tili</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOVELLUS-NÄKYMÄ -->
+  <div id="app-view" style="display:none;">
+
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="app-logo">TREENI<span>LOG</span></div>
+        <div class="header-right">
+          <span class="username-badge" id="header-username"></span>
+          <button class="btn-logout" onclick="logout()">Kirjaudu ulos</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+
+      <!-- Lisää treeni -->
+      <section class="card">
+        <h2 class="section-title">Lisää treeni</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label>Päivämäärä</label>
+            <input type="date" id="date" />
+          </div>
+          <div class="field">
+            <label>Treenityyppi</label>
+            <select id="type">
+              <option value="">Valitse...</option>
+              <option value="Kuntosali">Kuntosali</option>
+              <option value="Juoksu">Juoksu</option>
+              <option value="Kävely">Kävely</option>
+              <option value="Pyöräily">Pyöräily</option>
+              <option value="Jääkiekko">Jääkiekko</option>
+              <option value="Tanssi">Tanssi</option>
+              <option value="Ratsastus">Ratsastus</option>
+              <option value="Muu">Muu</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Kesto (min)</label>
+            <input type="number" min="1" id="duration" placeholder="esim. 60" />
+          </div>
+          <div class="field">
+            <label>Rasittavuus</label>
+            <select id="intensity">
+              <option value="">Valitse...</option>
+              <option value="Kevyt">Kevyt</option>
+              <option value="Keskitaso">Keskitaso</option>
+              <option value="Kova">Kova</option>
+            </select>
+          </div>
+
+          <div class="field full-width" id="distance-fields" style="display:none;">
+            <label>Matka</label>
+            <div class="distance-row">
+              <input type="number" min="0" id="dist-km" placeholder="0" />
+              <span class="unit">km</span>
+              <input type="number" min="0" max="999" id="dist-m" placeholder="0" />
+              <span class="unit">m</span>
+            </div>
+          </div>
+
+          <div class="field full-width">
+            <label>Muistiinpanot <span class="hint">(valinnainen)</span></label>
+            <input type="text" id="notes" placeholder="esim. jalat, intervallit, peli..." />
+          </div>
+        </div>
+        <div id="form-error" class="form-error" style="display:none;"></div>
+        <button class="btn-primary mt" onclick="addWorkout()">+ Lisää treeni</button>
+      </section>
+
+      <!-- Suodattimet -->
+      <section class="card">
+        <h2 class="section-title">Suodata</h2>
+        <div class="filter-grid">
+          <div class="field">
+            <label>Treenityyppi</label>
+            <select id="filter-type" onchange="applyFilters()">
+              <option value="Kaikki">Kaikki</option>
+              <option value="Kuntosali">Kuntosali</option>
+              <option value="Juoksu">Juoksu</option>
+              <option value="Kävely">Kävely</option>
+              <option value="Pyöräily">Pyöräily</option>
+              <option value="Jääkiekko">Jääkiekko</option>
+              <option value="Tanssi">Tanssi</option>
+              <option value="Ratsastus">Ratsastus</option>
+              <option value="Muu">Muu</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Rasittavuus</label>
+            <select id="filter-intensity" onchange="applyFilters()">
+              <option value="Kaikki">Kaikki</option>
+              <option value="Kevyt">Kevyt</option>
+              <option value="Keskitaso">Keskitaso</option>
+              <option value="Kova">Kova</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Ajanjakso</label>
+            <select id="filter-period" onchange="applyFilters()">
+              <option value="Kaikki">Kaikki ajat</option>
+              <option value="Viikko">Tämä viikko</option>
+              <option value="Kuukausi">Tämä kuukausi</option>
+              <option value="Vuosi">Tämä vuosi</option>
+            </select>
+          </div>
+          <div class="field align-end">
+            <button class="btn-secondary" onclick="clearFilters()">Tyhjennä</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Yhteenveto + Kaavio -->
+      <div class="two-col">
+        <section class="card">
+          <h2 class="section-title">Yhteenveto</h2>
+          <div class="stat-list">
+            <div class="stat-row">
+              <span class="stat-label">Treenejä</span>
+              <span class="stat-value" id="total-workouts">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Yhteiskesto</span>
+              <span class="stat-value"><span id="total-minutes">0</span> min</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Keskiarvo</span>
+              <span class="stat-value"><span id="avg-minutes">0</span> min</span>
+            </div>
+          </div>
+          <div id="distance-summary" style="display:none;">
+            <div class="divider"></div>
+            <p class="stat-group-title">Juoksu &amp; Kävely</p>
+            <div class="stat-row">
+              <span class="stat-label">Juostu</span>
+              <span class="stat-value" id="total-run-dist">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Kävelty</span>
+              <span class="stat-value" id="total-walk-dist">0</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="section-title">Treenit treenityypeittäin (min)</h2>
+          <canvas id="workout-chart"></canvas>
+        </section>
+      </div>
+
+      <!-- Treenilista -->
+      <section class="card">
+        <h2 class="section-title">Treenilista</h2>
+        <div class="table-wrap">
+          <table id="workout-table">
+            <thead>
+              <tr>
+                <th>Pvm</th>
+                <th>Tyyppi</th>
+                <th>Kesto</th>
+                <th>Matka</th>
+                <th>Rasittavuus</th>
+                <th>Muistiinpanot</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="workout-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
